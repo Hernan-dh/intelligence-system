@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DATABASE_PATH: /app/data/intelligence.db
+      PHOENIX_COLLECTOR_ENDPOINT: http://phoenix:6006/v1/traces
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+    volumes:
+      - intelligence_data:/app/data
+    depends_on: [phoenix]
+  phoenix:
+    image: arizephoenix/phoenix:version-7.0.0
+    ports: ["6006:6006"]
+volumes:
+  intelligence_data:
