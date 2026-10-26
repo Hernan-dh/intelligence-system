@@ -16,6 +16,7 @@ flowchart LR
     Retrieval --> Writer
     Writer <--> Memory[(LangGraph SQLite checkpoints)]
     Writer --> Response[answer + sources + trace]
+    Response --> END[HTTP response / graph END]
     API -. optional telemetry .-> Phoenix[Arize Phoenix]
 ```
 
@@ -32,3 +33,7 @@ flowchart LR
 ## Data and security
 
 The project stores only the knowledge documents and conversation checkpoints in the configured local database. API keys belong in an ignored `.env` file or deployment-secret store. The repository deliberately ships only placeholder configuration in `.env.example`; no production data, database, or telemetry export is versioned.
+
+## Observability contract
+
+`POST /v1/chat` creates an `intelligence.chat` span and records `session.id`, `input.value`, `output.value`, and `rag.source_count`. Unit tests verify that these attributes are emitted to the configured OpenTelemetry tracer. Phoenix delivery remains an optional integration concern: run Docker Compose and `scripts/run_observability_checks.ps1` to inspect the five repeatable requests in the `intelligence-system` Phoenix project.

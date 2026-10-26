@@ -15,6 +15,8 @@ uvicorn app.main:app --reload
 
 The OpenAPI interface is available at `http://127.0.0.1:8000/docs`. `docker compose up --build` starts the API and Phoenix together. Compose stores the SQLite database in the named `intelligence_data` volume.
 
+Python 3.12 or newer is required. The constraint is recorded in `pyproject.toml`, and `.python-version` selects 3.12 for version managers.
+
 ## Verification
 
 ```powershell
@@ -28,6 +30,8 @@ For a running API, replay the observability scenario with:
 ```powershell
 .\scripts\run_observability_checks.ps1
 ```
+
+With Docker Compose running, open `http://127.0.0.1:6006`, select the `intelligence-system` project, and inspect the `intelligence.chat` spans. Filter by `session.id` to see the two related VPN requests; use `rag.source_count` and span duration to compare retrieval coverage and latency.
 
 ## Publishing
 
@@ -52,6 +56,6 @@ python scripts/publish.py
 
 The preview validates the project and lists every changed file without modifying Git. The interactive command requires the exact word `PUBLISH`, then stages the listed files, verifies again, commits, and pushes the active branch. It never force-pushes.
 
-Supply `--title` and `--description` to avoid external commit-message generation. Otherwise the script tries `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, and `GROQ_API_KEY` from `.env`, in that order; only the changed-file names and diff are sent to the selected provider.
+Supply `--title` and `--description` to avoid external commit-message generation. Otherwise the script rotates through `GEMINI_API_KEY` plus optional numbered Gemini keys and configured Gemini models, then tries `OPENROUTER_API_KEY` and `GROQ_API_KEY`; only the changed-file names and diff are sent to the selected provider. If every provider fails, publication stops without staging files rather than using generic commit text.
 
 Before making a repository public, review `git status --short`, `git diff --check`, and every new file. Removing a secret from the working tree does not remove it from Git history.

@@ -1,3 +1,4 @@
+import re
 from typing import Annotated, Literal, TypedDict
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
@@ -15,17 +16,34 @@ class IntelligenceState(TypedDict, total=False):
     trace: list[AgentTrace]
 
 
+RETRIEVAL_TERMS = {
+    "cómo", "como", "cuál", "cual", "qué", "que", "vpn", "contraseña",
+    "incidente", "política", "proceso", "acceso",
+}
+
+
+def deterministic_route(query: str) -> Literal["researcher", "writer"]:
+    """Route known knowledge requests without depending on model wording."""
+    return "researcher" if any(term in query.lower() for term in RETRIEVAL_TERMS) else "writer"
+
+
+def parse_route(content: object) -> Literal["researcher", "writer"] | None:
+    """Accept only the constrained routing tokens, never a best-effort guess."""
+    match = re.fullmatch(r"\s*(RESEARCHER|WRITER)\s*[.!]?\s*", str(content), flags=re.IGNORECASE)
+    return match.group(1).lower() if match else None
+
+
 def build_graph(rag: LocalRAG, checkpointer):
     async def supervisor(state: IntelligenceState):
-        query = state["query"].lower()
-        retrieval_terms = {"cómo", "como", "cuál", "cual", "qué", "que", "vpn", "contraseña", "incidente", "política", "proceso", "acceso"}
+        fallback_route = deterministic_route(state["query"])
         if settings.openai_api_key:
             from langchain_openai import ChatOpenAI
             model = ChatOpenAI(model=settings.openai_model, api_key=settings.openai_api_key, temperature=0)
             decision = await _invoke_with_retry(model, f"Sos un supervisor. Respondé únicamente RESEARCHER si la pregunta requiere consultar documentación; respondé únicamente WRITER si es conversación general. Pregunta: {state['query']}")
-            route = "researcher" if "RESEARCHER" in str(decision.content).upper() else "writer"
+            model_route = parse_route(decision.content)
+            route = "researcher" if fallback_route == "researcher" else (model_route or fallback_route)
         else:
-            route = "researcher" if any(term in query for term in retrieval_terms) else "writer"
+            route = fallback_route
         detail = "Delegó la búsqueda de conocimiento al agente RAG." if route == "researcher" else "Identificó una consulta conversacional y delegó la respuesta directa al escritor."
         return {"route": route, "sources": [], "trace": [AgentTrace(agent="supervisor", detail=detail)]}
 
@@ -37,7 +55,9 @@ def build_graph(rag: LocalRAG, checkpointer):
         sources = state["sources"]
         context = "\n".join(f"- {source.title}: {source.excerpt}" for source in sources) or "Sin fuentes recuperadas."
         history = "\n".join(str(message.content) for message in state.get("messages", [])[-6:] if hasattr(message, "content"))
-        if settings.openai_api_key:
+        if state["route"] == "researcher" and not sources:
+            answer = "No encontré información suficiente en la documentación disponible para responder esa consulta."
+        elif settings.openai_api_key:
             from langchain_openai import ChatOpenAI
             model = ChatOpenAI(model=settings.openai_model, api_key=settings.openai_api_key, temperature=0)
             response = await _invoke_with_retry(model, f"Respondé en español usando solo este contexto. Considerá el historial para mantener la conversación. Si no alcanza, decilo.\n\nHistorial:\n{history}\n\nContexto:\n{context}\n\nPregunta: {state['query']}")

@@ -64,6 +64,10 @@ Invoke-RestMethod -Method Post http://127.0.0.1:8000/v1/documents `
 
 See [architecture](docs/ARCHITECTURE.md) for the data flow and trust boundaries, and [operations](docs/OPERATIONS.md) for verification, deployment, and publication.
 
+## Observability
+
+When `PHOENIX_COLLECTOR_ENDPOINT` is configured, each chat request emits an OpenTelemetry span named `intelligence.chat`. Inspect `session.id`, `rag.source_count`, `input.value`, and `output.value` in Phoenix to follow a conversation and compare response behavior. Run `scripts/run_observability_checks.ps1` after starting Docker Compose to send the five repeatable scenarios, including two requests for the same thread.
+
 ## Quality and publication
 
 ```powershell

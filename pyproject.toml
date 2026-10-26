@@ -1,0 +1,5 @@
+[project]
+name = "intelligence-system"
+version = "1.0.0"
+description = "Local-first knowledge API with grounded retrieval and persistent agent state."
+requires-python = ">=3.12"
