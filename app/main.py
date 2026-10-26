@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
         yield
 
 
-app = FastAPI(title="Intelligence System", version="1.0.0", lifespan=lifespan, root_path=settings.app_root_path)
+app = FastAPI(title="AI Knowledge Copilot", version="1.0.0", lifespan=lifespan, root_path=settings.app_root_path)
 
 
 @app.get("/health", response_model=HealthResponse)

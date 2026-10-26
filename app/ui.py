@@ -15,7 +15,7 @@ IngestHandler = Callable[[DocumentIngestRequest], Awaitable[DocumentIngestRespon
 
 
 def _header() -> str:
-    return """<div class="is-mark"><span></span><span></span><span></span><span></span></div><div><p class="is-eyebrow">Local-first knowledge API · English-first</p><h1 class="is-title">Intelligence <span>System</span></h1></div><p class="is-status">● API online</p>"""
+    return """<div class="is-mark"><span></span><span></span><span></span><span></span></div><div><p class="is-eyebrow">Local-first knowledge API · English-first</p><h1 class="is-title">AI Knowledge <span>Copilot</span></h1></div><p class="is-status">● API online</p>"""
 
 
 def build_ui(chat_handler: ChatHandler, ingest_handler: IngestHandler) -> gr.Blocks:
@@ -49,7 +49,7 @@ def build_ui(chat_handler: ChatHandler, ingest_handler: IngestHandler) -> gr.Blo
             raise gr.Error(str(error.detail)) from error
         return f"**{response.status.title()}** — `{response.document_id}` is ready for retrieval."
 
-    with gr.Blocks(title="Intelligence System", css=CSS, theme=gr.themes.Base()) as demo:
+    with gr.Blocks(title="AI Knowledge Copilot", css=CSS, theme=gr.themes.Base()) as demo:
         gr.HTML(_header(), elem_id="is-header")
         with gr.Row():
             with gr.Column(scale=3):

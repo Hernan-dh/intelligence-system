@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Intelligence System is a local-first internal-knowledge API. It retrieves relevant procedures, generates an English-first grounded response, and returns the sources and a compact execution trace with every answer.
+AI Knowledge Copilot is a local-first internal-knowledge assistant. It retrieves relevant procedures, generates an English-first grounded response, and returns the sources and a compact execution trace with every answer.
 
 ## Request flow
 
