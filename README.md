@@ -2,7 +2,7 @@
 
 A local-first, production-oriented knowledge API built with FastAPI, LangGraph, SQLite, and optional Phoenix tracing. It retrieves internal procedures, keeps conversation state by thread, and returns an answer with its sources and execution trace.
 
-The system runs end-to-end without paid credentials: its local retrieval and deterministic fallback make the API testable offline. An OpenAI key is optional and enables model-generated routing and grounded writing.
+The system runs end-to-end without paid credentials: its local retrieval and deterministic fallback make the API testable offline. Responses are English-first, including the deterministic fallback. An OpenAI key is optional and enables model-generated routing and grounded writing.
 
 ## What it demonstrates
 

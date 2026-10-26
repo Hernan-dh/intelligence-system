@@ -39,34 +39,34 @@ def build_graph(rag: LocalRAG, checkpointer):
         if settings.openai_api_key:
             from langchain_openai import ChatOpenAI
             model = ChatOpenAI(model=settings.openai_model, api_key=settings.openai_api_key, temperature=0)
-            decision = await _invoke_with_retry(model, f"Sos un supervisor. Respondé únicamente RESEARCHER si la pregunta requiere consultar documentación; respondé únicamente WRITER si es conversación general. Pregunta: {state['query']}")
+            decision = await _invoke_with_retry(model, f"You are a supervisor. Reply only RESEARCHER when the question requires documentation lookup; reply only WRITER for general conversation. Question: {state['query']}")
             model_route = parse_route(decision.content)
             route = "researcher" if fallback_route == "researcher" else (model_route or fallback_route)
         else:
             route = fallback_route
-        detail = "Delegó la búsqueda de conocimiento al agente RAG." if route == "researcher" else "Identificó una consulta conversacional y delegó la respuesta directa al escritor."
+        detail = "Delegated the knowledge lookup to the RAG agent." if route == "researcher" else "Identified a general conversation request and delegated the direct response to the writer."
         return {"route": route, "sources": [], "trace": [AgentTrace(agent="supervisor", detail=detail)]}
 
     async def researcher(state: IntelligenceState):
         result = await rag.search(SearchKnowledgeInput(query=state["query"]))
-        return {"sources": result.sources, "trace": state["trace"] + [AgentTrace(agent="researcher", detail=f"Recuperó {len(result.sources)} fuentes locales mediante ranking híbrido.")]}
+        return {"sources": result.sources, "trace": state["trace"] + [AgentTrace(agent="researcher", detail=f"Retrieved {len(result.sources)} local sources through hybrid ranking.")]}
 
     async def writer(state: IntelligenceState):
         sources = state["sources"]
         context = "\n".join(f"- {source.title}: {source.excerpt}" for source in sources) or "Sin fuentes recuperadas."
         history = "\n".join(str(message.content) for message in state.get("messages", [])[-6:] if hasattr(message, "content"))
         if state["route"] == "researcher" and not sources:
-            answer = "No encontré información suficiente en la documentación disponible para responder esa consulta."
+            answer = "I could not find enough information in the available documentation to answer that question."
         elif settings.openai_api_key:
             from langchain_openai import ChatOpenAI
             model = ChatOpenAI(model=settings.openai_model, api_key=settings.openai_api_key, temperature=0)
-            response = await _invoke_with_retry(model, f"Respondé en español usando solo este contexto. Considerá el historial para mantener la conversación. Si no alcanza, decilo.\n\nHistorial:\n{history}\n\nContexto:\n{context}\n\nPregunta: {state['query']}")
+            response = await _invoke_with_retry(model, f"Respond in English using only this context. Use the conversation history to preserve context. If the context is insufficient, say so.\n\nHistory:\n{history}\n\nContext:\n{context}\n\nQuestion: {state['query']}")
             answer = str(response.content)
         elif sources:
-            answer = f"Según la documentación disponible: {sources[0].excerpt}"
+            answer = f"According to the available documentation: {sources[0].excerpt}"
         else:
-            answer = "Hola. Puedo ayudarte con consultas sobre los procedimientos disponibles."
-        return {"answer": answer, "trace": state["trace"] + [AgentTrace(agent="writer", detail="Generó una respuesta fundamentada en las fuentes recuperadas.")]}
+            answer = "Hello. I can help with questions about the available procedures."
+        return {"answer": answer, "trace": state["trace"] + [AgentTrace(agent="writer", detail="Generated a response grounded in the retrieved sources.")]}
 
     graph = StateGraph(IntelligenceState)
     graph.add_node("supervisor", supervisor)

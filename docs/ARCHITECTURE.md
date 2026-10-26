@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Intelligence System is a local-first internal-knowledge API. It retrieves relevant procedures, generates a grounded Spanish response, and returns the sources and a compact execution trace with every answer.
+Intelligence System is a local-first internal-knowledge API. It retrieves relevant procedures, generates an English-first grounded response, and returns the sources and a compact execution trace with every answer.
 
 ## Request flow
 
