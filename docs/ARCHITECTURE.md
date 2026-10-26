@@ -25,6 +25,7 @@ flowchart LR
 ## Components and boundaries
 
 - **FastAPI** is the public HTTP boundary; Pydantic constrains request and response payloads.
+- **Gradio** is mounted at `/ui` and calls the same validated chat and ingestion handlers as the HTTP API; it adds no separate agent state or retrieval path.
 - **LocalRAG** persists documents in SQLite and blends lexical overlap with a deterministic local vector representation. It does not call an embedding provider.
 - **LangGraph** coordinates the supervisor, researcher, and writer. `AsyncSqliteSaver` persists per-thread state.
 - **OpenAI is optional.** Without `OPENAI_API_KEY`, the project remains executable with deterministic grounded responses. With a key, only the supervisor and writer prompts are sent to the configured provider.

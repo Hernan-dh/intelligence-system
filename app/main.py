@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 import logging
+import gradio as gr
 from fastapi import FastAPI, HTTPException
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from opentelemetry import trace
@@ -8,6 +9,7 @@ from app.graph import build_graph
 from app.observability import configure_observability
 from app.rag import LocalRAG
 from app.schemas import ChatRequest, ChatResponse, DocumentIngestRequest, DocumentIngestResponse, HealthResponse
+from app.ui import build_ui
 
 logging.basicConfig(level=logging.INFO, format='{"time":"%(asctime)s","level":"%(levelname)s","message":"%(message)s"}')
 logger = logging.getLogger(__name__)
@@ -55,3 +57,6 @@ async def chat(request: ChatRequest) -> ChatResponse:
 async def ingest_document(request: DocumentIngestRequest) -> DocumentIngestResponse:
     status = await app.state.rag.ingest(request)
     return DocumentIngestResponse(document_id=request.document_id, status=status)
+
+
+app = gr.mount_gradio_app(app, build_ui(chat, ingest_document), path="/ui", show_api=False)

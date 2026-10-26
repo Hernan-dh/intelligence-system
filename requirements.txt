@@ -1,5 +1,6 @@
 aiosqlite==0.20.0
 fastapi==0.115.6
+gradio==5.49.1
 httpx==0.28.1
 langchain-openai==0.2.14
 langgraph==0.2.60

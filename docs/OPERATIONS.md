@@ -13,7 +13,7 @@ python -m pytest -q
 uvicorn app.main:app --reload
 ```
 
-The OpenAPI interface is available at `http://127.0.0.1:8000/docs`. `docker compose up --build` starts the API and Phoenix together. Compose stores the SQLite database in the named `intelligence_data` volume.
+The browser interface is available at `http://127.0.0.1:8000/ui` and OpenAPI at `http://127.0.0.1:8000/docs`. `docker compose up --build` starts the API and Phoenix together. Compose stores the SQLite database in the named `intelligence_data` volume.
 
 Python 3.12 or newer is required. The constraint is recorded in `pyproject.toml`, and `.python-version` selects 3.12 for version managers.
 
