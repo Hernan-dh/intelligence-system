@@ -1,0 +1,35 @@
+name: Deploy Intelligence System
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-intelligence-system
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure deployment SSH
+        env:
+          NETCUP_KNOWN_HOSTS: ${{ secrets.NETCUP_KNOWN_HOSTS }}
+          NETCUP_SSH_KEY: ${{ secrets.NETCUP_SSH_KEY }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$NETCUP_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$NETCUP_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Sync source and rebuild Intelligence System
+        env:
+          NETCUP_HOST: ${{ secrets.NETCUP_HOST }}
+          NETCUP_USER: ${{ secrets.NETCUP_USER }}
+        run: |
+          rsync -az --no-g --exclude '.env' --exclude '.git' --exclude '.venv' --exclude '__pycache__' --exclude '.pytest_cache' --exclude 'data' ./ "$NETCUP_USER@$NETCUP_HOST:/srv/portfolio-demos/intelligence-system/"
+          ssh -o StrictHostKeyChecking=yes "$NETCUP_USER@$NETCUP_HOST" 'cd /srv/portfolio-demos/portfolio-stack && sudo -n docker compose --profile demos up -d --build intelligence'

@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     openai_model: str = "gpt-4o-mini"
     phoenix_collector_endpoint: str | None = None
+    app_root_path: str = ""
 
     def ensure_data_dir(self) -> None:
         Path(self.database_path).parent.mkdir(parents=True, exist_ok=True)

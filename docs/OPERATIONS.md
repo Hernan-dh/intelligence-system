@@ -13,7 +13,7 @@ python -m pytest -q
 uvicorn app.main:app --reload
 ```
 
-The browser interface is available at `http://127.0.0.1:8000/ui` and OpenAPI at `http://127.0.0.1:8000/docs`. `docker compose up --build` starts the API and Phoenix together. Compose stores the SQLite database in the named `intelligence_data` volume.
+The browser interface is available at `http://127.0.0.1:8000/` and OpenAPI at `http://127.0.0.1:8000/docs`. `docker compose up --build` starts the API and Phoenix together. Compose stores the SQLite database in the named `intelligence_data` volume.
 
 Python 3.12 or newer is required. The constraint is recorded in `pyproject.toml`, and `.python-version` selects 3.12 for version managers.
 
@@ -59,3 +59,9 @@ The preview validates the project and lists every changed file without modifying
 Supply `--title` and `--description` to avoid external commit-message generation. Otherwise the script rotates through `GEMINI_API_KEY` plus optional numbered Gemini keys and configured Gemini models, then tries `OPENROUTER_API_KEY` and `GROQ_API_KEY`; only the changed-file names and diff are sent to the selected provider. If every provider fails, publication stops without staging files rather than using generic commit text.
 
 Before making a repository public, review `git status --short`, `git diff --check`, and every new file. Removing a secret from the working tree does not remove it from Git history.
+
+## Public demo deployment
+
+Pushes to `main` run `.github/workflows/deploy.yml`. The workflow preserves the VPS `.env`, syncs source to `/srv/portfolio-demos/intelligence-system`, and rebuilds the `intelligence` service in the shared `portfolio-stack` Compose project. Configure `NETCUP_HOST`, `NETCUP_USER`, `NETCUP_SSH_KEY`, and `NETCUP_KNOWN_HOSTS` as repository secrets before the first push.
+
+The shared stack binds the service only to loopback port `7866`; Caddy exposes the browser interface at `https://portfolio-hdh.duckdns.org/intelligence`. The deployment supplies `APP_ROOT_PATH=/intelligence`, so do not replace it in the VPS `.env`. After deployment, open the UI, ask a VPN question, verify sources and trace, then add a test document and confirm it can be retrieved.

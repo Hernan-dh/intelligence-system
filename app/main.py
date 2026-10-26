@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
         yield
 
 
-app = FastAPI(title="Intelligence System", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Intelligence System", version="1.0.0", lifespan=lifespan, root_path=settings.app_root_path)
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -59,4 +59,4 @@ async def ingest_document(request: DocumentIngestRequest) -> DocumentIngestRespo
     return DocumentIngestResponse(document_id=request.document_id, status=status)
 
 
-app = gr.mount_gradio_app(app, build_ui(chat, ingest_document), path="/ui", show_api=False)
+app = gr.mount_gradio_app(app, build_ui(chat, ingest_document), path="/", root_path=settings.app_root_path, show_api=False)

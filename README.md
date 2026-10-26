@@ -27,7 +27,7 @@ python -m pytest -q
 uvicorn app.main:app --reload
 ```
 
-Open `http://127.0.0.1:8000/ui` for the browser interface or `http://127.0.0.1:8000/docs` for OpenAPI. The Gradio interface exposes the chat, retrieved sources, execution trace, persistent `thread_id`, and document ingestion. Do not commit `.env`; it is ignored and `.env.example` contains only placeholders.
+Open `http://127.0.0.1:8000/` for the browser interface or `http://127.0.0.1:8000/docs` for OpenAPI. The Gradio interface exposes the chat, retrieved sources, execution trace, persistent `thread_id`, and document ingestion. Do not commit `.env`; it is ignored and `.env.example` contains only placeholders.
 
 To start the API and Phoenix together:
 
