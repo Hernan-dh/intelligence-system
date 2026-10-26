@@ -1,8 +1,13 @@
 .env
+.env.*
+!.env.example
 .venv/
 __pycache__/
 .pytest_cache/
 .test-tmp/
 .pytest-tmp/
+.verify-*/
 data/*.db
 data/*.db-*
+coverage.xml
+htmlcov/
