@@ -15,7 +15,7 @@ IngestHandler = Callable[[DocumentIngestRequest], Awaitable[DocumentIngestRespon
 
 
 def _header() -> str:
-    return """<div class="intelligence-brand"><div class="intelligence-mark" aria-hidden="true"><span class="intelligence-bar intelligence-bar-1"></span><span class="intelligence-bar intelligence-bar-2"></span><span class="intelligence-bar intelligence-bar-3"></span></div><div class="intelligence-headings"><h1>KNOWLEDGE<span class="intelligence-sep">/</span>COPILOT</h1><p>LOCAL-FIRST KNOWLEDGE API</p></div></div><p class="is-status">● API online</p>"""
+    return """<div class="intelligence-brand"><div class="intelligence-mark" aria-hidden="true"><span class="intelligence-bar intelligence-bar-1"></span><span class="intelligence-bar intelligence-bar-2"></span><span class="intelligence-bar intelligence-bar-3"></span></div><div class="intelligence-headings"><h1>KNOWLEDGE<span class="intelligence-sep">/</span>COPILOT</h1><p>LOCAL-FIRST KNOWLEDGE API</p></div></div>"""
 
 
 def build_ui(chat_handler: ChatHandler, ingest_handler: IngestHandler) -> gr.Blocks:
