@@ -53,8 +53,7 @@ def build_ui(chat_handler: ChatHandler, ingest_handler: IngestHandler) -> gr.Blo
         gr.HTML(_header(), elem_id="is-header")
         with gr.Row():
             with gr.Column(scale=3):
-                gr.Markdown("Ask a question; the copilot retrieves the most relevant local sources and uses them to ground its answer.\n\nReview the cited evidence and execution trace, or add documents to expand the knowledge base.", elem_id="knowledge-intro")
-                chatbot = gr.Chatbot(show_label=False, type="messages", height=420, elem_id="is-chat")
+                chatbot = gr.Chatbot(label="Ask a question to retrieve grounded answers. Review sources and the execution trace.", type="messages", height=420, elem_id="is-chat")
                 with gr.Row():
                     message = gr.Textbox(label="Ask the knowledge base", placeholder="How do I request VPN access?", scale=4)
                     thread_id = gr.Textbox(label="Thread ID", value="demo-1", scale=1)
