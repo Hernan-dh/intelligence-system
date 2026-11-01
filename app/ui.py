@@ -15,7 +15,7 @@ IngestHandler = Callable[[DocumentIngestRequest], Awaitable[DocumentIngestRespon
 
 
 def _header() -> str:
-    return """<div class="intelligence-brand"><div class="intelligence-mark" aria-hidden="true"><span class="intelligence-bar intelligence-bar-1"></span><span class="intelligence-bar intelligence-bar-2"></span><span class="intelligence-bar intelligence-bar-3"></span></div><div class="intelligence-headings"><h1>KNOWLEDGE<span class="intelligence-sep">/</span>COPILOT</h1><p>LOCAL-FIRST KNOWLEDGE API</p></div></div><p class="is-status">● API online</p><div class="knowledge-intro"><p>Ask a question; the copilot retrieves the most relevant local sources and uses them to ground its answer.</p><p>Review the cited evidence and execution trace, or add documents to expand the knowledge base.</p></div>"""
+    return """<div class="intelligence-brand"><div class="intelligence-mark" aria-hidden="true"><span class="intelligence-bar intelligence-bar-1"></span><span class="intelligence-bar intelligence-bar-2"></span><span class="intelligence-bar intelligence-bar-3"></span></div><div class="intelligence-headings"><h1>KNOWLEDGE<span class="intelligence-sep">/</span>COPILOT</h1><p>LOCAL-FIRST KNOWLEDGE API</p></div></div><p class="is-status">● API online</p>"""
 
 
 def build_ui(chat_handler: ChatHandler, ingest_handler: IngestHandler) -> gr.Blocks:
@@ -49,11 +49,12 @@ def build_ui(chat_handler: ChatHandler, ingest_handler: IngestHandler) -> gr.Blo
             raise gr.Error(str(error.detail)) from error
         return f"**{response.status.title()}** — `{response.document_id}` is ready for retrieval."
 
-    with gr.Blocks(title="AI Knowledge Copilot", css=CSS, theme=gr.themes.Base()) as demo:
+    with gr.Blocks(title="Knowledge Copilot", css=CSS, theme=gr.themes.Base(), js="""() => { const translations = {'Ordenar ascendente':'Sort ascending','Ordenar descendente':'Sort descending','Limpiar ordenamiento':'Clear sort','Filtrar':'Filter','Limpiar filtros':'Clear filters'}; const localize = () => { const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode); nodes.forEach(node => { const value = node.nodeValue.trim(); if (translations[value]) node.nodeValue = node.nodeValue.replace(value, translations[value]); }); }; localize(); new MutationObserver(localize).observe(document.body, {childList:true, subtree:true}); }""") as demo:
         gr.HTML(_header(), elem_id="is-header")
         with gr.Row():
             with gr.Column(scale=3):
-                chatbot = gr.Chatbot(label="Knowledge conversation", type="messages", height=420, elem_id="is-chat")
+                gr.Markdown("Ask a question; the copilot retrieves the most relevant local sources and uses them to ground its answer.\n\nReview the cited evidence and execution trace, or add documents to expand the knowledge base.", elem_id="knowledge-intro")
+                chatbot = gr.Chatbot(show_label=False, type="messages", height=420, elem_id="is-chat")
                 with gr.Row():
                     message = gr.Textbox(label="Ask the knowledge base", placeholder="How do I request VPN access?", scale=4)
                     thread_id = gr.Textbox(label="Thread ID", value="demo-1", scale=1)
